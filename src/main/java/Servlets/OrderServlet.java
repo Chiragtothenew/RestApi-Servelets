@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/orders")
+@WebServlet("/orders")  //Context Route
 public class OrderServlet extends HttpServlet {
 
     private List<Order> orderList = new ArrayList<Order>();
@@ -38,13 +38,16 @@ public class OrderServlet extends HttpServlet {
             if(order == null)
             {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                PrintWriter out = resp.getWriter();
+                out.write("Order with id : "+id+" Not Found");
+
             }
 
         }
 
         else
         {
-            resp.setHeader("ContentType","text/plain");
+            resp.setHeader("ContentType","application/json");
             PrintWriter out = resp.getWriter();
             out.write(String.valueOf(order));
         }
