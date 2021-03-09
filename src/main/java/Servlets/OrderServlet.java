@@ -53,9 +53,10 @@ public class OrderServlet extends HttpServlet {
 
     private String addOrder(int quantity, String name, HttpServletResponse resp){
 
-        this.orderList.add(new Order(name, quantity));
+        this.orderList.add(new Order(name, quantity,counter++));
         resp.setStatus(HttpServletResponse.SC_CREATED);
         return "Order successfully added.";
+
     }
 
     private String deleteOrder(int id){

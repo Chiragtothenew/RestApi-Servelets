@@ -6,7 +6,7 @@ public class Order {
     private int quantity;
     private int id;
 
-    public Order(String name, int quantity)
+    public Order(String name, int quantity,int id)
     {
         this.name = name;
         this.quantity = quantity;
@@ -44,7 +44,7 @@ public class Order {
         return "{" +
                 "name='" + name + '\'' +
                 ", quantity=" + quantity +
-                '}';
+                "id ="+id+"}";
     }
 
 
