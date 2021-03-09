@@ -130,6 +130,8 @@ public class OrderServlet extends HttpServlet {
             orderList.remove(i);
             i++;
         }
+
+        counter=1;
     }
 
 }
