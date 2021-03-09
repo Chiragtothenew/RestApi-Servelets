@@ -27,7 +27,27 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
+        String name = req.getParameter("name");
+        int quantity = Integer.parseInt(req.getParameter("quantity"));
+        int id = Integer.parseInt(req.getParameter("id"));
+        Order order = getOrderById(id,resp);
 
+        if(name!=null && quantity!=0 && id!=0)
+        {
+
+            if(order == null)
+            {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+
+        }
+
+        else
+        {
+            resp.setHeader("ContentType","text/plain");
+            PrintWriter out = resp.getWriter();
+            out.write(String.valueOf(order));
+        }
 
     }
 
@@ -78,22 +98,12 @@ public class OrderServlet extends HttpServlet {
 
     }
 
-    private void listAllOrders(HttpServletResponse resp)
+    private void listAllOrders()
     {
-        if(orderList.size()>=0)
+        for(Order order : orderList)
         {
-            for(Order order : orderList)
-            {
-                System.out.println(order);
-            }
+            System.out.println(order);
         }
-
-        else
-        {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            System.out.println("Order List is Empty");
-        }
-
 
     }
 
@@ -110,6 +120,16 @@ public class OrderServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         System.out.println("Order Not Found!");
         return null;
+    }
+
+    public void destroy()
+    {
+        int i=0;
+        for(Order orders : orderList)
+        {
+            orderList.remove(i);
+            i++;
+        }
     }
 
 }
