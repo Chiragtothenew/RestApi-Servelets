@@ -1,5 +1,7 @@
 package Servlets;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import Order.Order;
 
 import javax.servlet.annotation.WebServlet;
@@ -11,7 +13,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/orders")  //Context Route
+@WebServlet("/order")  //Context Route
 public class OrderServlet extends HttpServlet {
 
     private List<Order> orderList = new ArrayList<Order>();
@@ -30,26 +32,22 @@ public class OrderServlet extends HttpServlet {
         String name = req.getParameter("name");
         int quantity = Integer.parseInt(req.getParameter("quantity"));
         int id = Integer.parseInt(req.getParameter("id"));
+        Gson gson = new GsonBuilder().create();
         Order order = getOrderById(id,resp);
 
-        if(name!=null && quantity!=0 && id!=0)
-        {
+        if(name!=null && quantity!=0 && id!=0) {
 
-            if(order == null)
-            {
+            if (order == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 PrintWriter out = resp.getWriter();
-                out.write("Order with id : "+id+" Not Found");
+                out.println("Order with id : " + id + " Not Found");
 
+            } else {
+                resp.setHeader("ContentType", "application/json");
+                PrintWriter out = resp.getWriter();
+                out.println(gson.toJson(order));
+                out.close();
             }
-
-        }
-
-        else
-        {
-            resp.setHeader("ContentType","application/json");
-            PrintWriter out = resp.getWriter();
-            out.write(String.valueOf(order));
         }
 
     }
@@ -74,6 +72,43 @@ public class OrderServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        String id = req.getParameter("id");
+        if (id != null && !id.equals("")){
+            String status = deleteOrder(Integer.parseInt(id), resp);
+            PrintWriter out = resp.getWriter();
+            out.println(status);
+            out.close();
+        }else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            PrintWriter out = resp.getWriter();
+            out.println("Please try again later!");
+            out.close();
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String name = req.getParameter("name");
+        String id = req.getParameter("id");
+
+        if (name != null  && id != null){
+            String status = updateById(Integer.parseInt(id), name, resp);
+            PrintWriter out = resp.getWriter();
+            out.println(status);
+            out.close();
+        }else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            PrintWriter out = resp.getWriter();
+            out.println("Please try again later!");
+            out.close();
+        }
+    }
+
+
+
     private String addOrder(int quantity, String name, HttpServletResponse resp){
 
         this.orderList.add(new Order(name, quantity,counter++));
@@ -81,8 +116,18 @@ public class OrderServlet extends HttpServlet {
         return "Order successfully added.";
 
     }
+    private String updateById(int id, String name, HttpServletResponse response){
+        for (Order order : orderList){
+            if (order.getId() == id){
+                order.setName(name);
+                return "Order name changed successfully";
+            }
+        }
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return " Id not found";
+    }
 
-    private String deleteOrder(int id){
+    private String deleteOrder(int id,HttpServletResponse resp){
 
         for(Order orders : orderList)
         {
@@ -127,14 +172,8 @@ public class OrderServlet extends HttpServlet {
 
     public void destroy()
     {
-        int i=0;
-        for(Order orders : orderList)
-        {
-            orderList.remove(i);
-            i++;
-        }
-
-        counter=1;
+        this.orderList.clear();
+        counter = 1;
     }
 
 }
