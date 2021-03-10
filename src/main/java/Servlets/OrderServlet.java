@@ -58,7 +58,7 @@ public class OrderServlet extends HttpServlet {
         String name = req.getParameter("name");
         int quantity = Integer.parseInt(req.getParameter("quantity"));
 
-        if (name != null && quantity != 0){
+        if (name != null && quantity != 0 ){
             String status = addOrder(quantity, name, resp);
             PrintWriter out = resp.getWriter();
             out.println(status);
